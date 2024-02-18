@@ -3,6 +3,8 @@ const proDiv = document.querySelector("#item");
 const cart = document.querySelector(".cart");
 const Realcart = document.querySelector(".cartup");
 const not = document.querySelector(".notification");
+const itemCount = document.querySelector(".itemCount");
+const countArray = [];
 
 const total = document.querySelector("h3");
 const menu = document.querySelector("#open");
@@ -13,8 +15,6 @@ menu.addEventListener("click", () => {
   Realcart.classList.add("activeCart");
   menu.style.display = "none";
   close.style.display = "block";
-
-  console.log("i was clicked");
 });
 close.addEventListener("click", () => {
   itemsDiv.style.display = "flex";
@@ -22,13 +22,11 @@ close.addEventListener("click", () => {
   Realcart.classList.remove("activeCart");
   menu.style.display = "block";
   close.style.display = "none";
-
-  console.log("i was clicked");
 });
 
 let priceArray = [];
 const apiFetch = async () => {
-  const response = await fetch("https://fakestoreapi.com/products?limit=12");
+  const response = await fetch("https://fakestoreapi.com/products?limit=28");
   const data = await response.json();
 
   data.map((item) => {
@@ -53,14 +51,17 @@ const apiFetch = async () => {
     div.appendChild(btn);
     btn.setAttribute("id", `${item.id}`);
     let sum = 0;
+
     // cart logic
+
+    // add to cart function
 
     btn.addEventListener("click", () => {
       setTimeout(() => {
-        not.style.display = "block";
+        not.style.transform = "translateX(0px)";
       }, 100);
       setTimeout(() => {
-        not.style.display = "none";
+        not.style.transform = "translateX(-800px)";
       }, 1000);
       const cartDiv = document.createElement("div");
       cartDiv.setAttribute("class", "products");
@@ -81,36 +82,40 @@ const apiFetch = async () => {
       btnDel.setAttribute("class", "delete");
       btnDel.innerText = "Remove";
       cartDiv.appendChild(btnDel);
-      //   total.innerText = 0;
 
       priceArray.push(item.price);
       for (i = 0; i < priceArray.length; i++) {
         sum = sum + priceArray[i];
       }
-      //   console.log(Math.floor(sum));
       total.innerText = Math.floor(sum) + " $";
-      //   console.log(priceArray);
+
+      countArray.push(1);
+
+      let result = countArray.reduce((red, res) => red + res, 0);
+
+      itemCount.innerText = result;
+
+      // close button function
 
       btnDel.addEventListener("click", () => {
-        // console.log("i'm clicked ", item.id);
         cart.removeChild(cartDiv);
 
         const position = priceArray.indexOf(item.price);
-        // console.log(priceArray.indexOf(item.price));
 
         priceArray.splice(position, 1);
 
-        // console.log(priceArray);
         const updatedSum = priceArray.reduce((acc, price) => acc + price, 0);
         total.innerText = Math.floor(updatedSum) + " $";
+
+        countArray.pop();
+
+        let result = countArray.reduce((red, res) => red + res, 0);
+
+        itemCount.innerText = result;
       });
 
       cart.appendChild(cartDiv);
-
-      //   console.log(`i just clicked ${item.id}`);
     });
-
-    // console.log(item);
   });
 };
 apiFetch();
